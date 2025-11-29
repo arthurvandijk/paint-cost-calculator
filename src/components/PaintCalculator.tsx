@@ -21,7 +21,8 @@ export type Paint = {
 export type Wall = {
   id: string
   name: string
-  area: number
+  length: number // in meters
+  height: number // in meters
   paintId: string
 }
 
@@ -41,8 +42,8 @@ const DEFAULT_ROOMS: Room[] = [
     id: "1",
     name: "Living Room",
     walls: [
-      { id: "w1", name: "North Wall", area: 15, paintId: "1" },
-      { id: "w2", name: "South Wall", area: 15, paintId: "1" },
+      { id: "w1", name: "North Wall", length: 5.00, height: 3.00, paintId: "1" },
+      { id: "w2", name: "South Wall", length: 5.00, height: 3.00, paintId: "1" },
     ],
   },
 ]
@@ -118,7 +119,8 @@ export function PaintCalculator() {
               {
                 id: crypto.randomUUID(),
                 name: `Wall ${r.walls.length + 1}`,
-                area: 10,
+                length: 4,
+                height: 2.5,
                 paintId: paints[0]?.id || "",
               },
             ],
@@ -169,9 +171,10 @@ export function PaintCalculator() {
           if (!paintTotals[paint.id]) {
             paintTotals[paint.id] = { area: 0, cost: 0, liters: 0 }
           }
-          const cost = wall.area * paint.price
-          const liters = wall.area / paint.coverage
-          paintTotals[paint.id].area += wall.area
+          const area = wall.length * wall.height
+          const cost = area * paint.price
+          const liters = area / paint.coverage
+          paintTotals[paint.id].area += area
           paintTotals[paint.id].cost += cost
           paintTotals[paint.id].liters += liters
           grandTotalCost += cost
@@ -234,8 +237,8 @@ export function PaintCalculator() {
                   <CardContent>
                     <div className="space-y-4">
                       {room.walls.map((wall) => (
-                        <div key={wall.id} className="grid grid-cols-12 gap-2 items-center">
-                          <div className="col-span-4">
+                        <div key={wall.id} className="grid grid-cols-14 gap-2 items-center">
+                          <div className="col-span-3">
                             <Label className="text-xs text-muted-foreground">Wall Name</Label>
                             <Input
                               value={wall.name}
@@ -243,16 +246,33 @@ export function PaintCalculator() {
                               className="h-8"
                             />
                           </div>
-                          <div className="col-span-3">
-                            <Label className="text-xs text-muted-foreground">Area (m²)</Label>
+                          <div className="col-span-2">
+                            <Label className="text-xs text-muted-foreground">Length (m)</Label>
                             <Input
                               type="number"
-                              value={wall.area}
-                              onChange={(e) => updateWall(room.id, wall.id, "area", parseFloat(e.target.value))}
+                              step="0.01"
+                              value={wall.length.toFixed(2)}
+                              onChange={(e) => updateWall(room.id, wall.id, "length", parseFloat(e.target.value) || 0)}
                               className="h-8"
                             />
                           </div>
-                          <div className="col-span-4">
+                          <div className="col-span-2">
+                            <Label className="text-xs text-muted-foreground">Height (m)</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={wall.height.toFixed(2)}
+                              onChange={(e) => updateWall(room.id, wall.id, "height", parseFloat(e.target.value) || 0)}
+                              className="h-8"
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Label className="text-xs text-muted-foreground">Area</Label>
+                            <div className="h-8 flex items-center px-3 bg-muted rounded-md text-sm">
+                              {(wall.length * wall.height).toFixed(2)} m²
+                            </div>
+                          </div>
+                          <div className="col-span-3">
                             <Label className="text-xs text-muted-foreground">Paint</Label>
                             <Select
                               value={wall.paintId}
