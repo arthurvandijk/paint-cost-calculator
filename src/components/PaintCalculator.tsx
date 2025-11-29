@@ -335,7 +335,7 @@ export function PaintCalculator() {
                               <div className="text-muted-foreground">Amount:</div>
                               <div className="text-right">{totals.liters.toFixed(2)} L</div>
                               <div className="text-muted-foreground">Cost:</div>
-                              <div className="text-right font-medium">${totals.cost.toFixed(2)}</div>
+                              <div className="text-right font-medium">€{totals.cost.toFixed(2)}</div>
                             </div>
                           </div>
                         )
@@ -343,10 +343,10 @@ export function PaintCalculator() {
                     </div>
                   </ScrollArea>
                 </CardContent>
-                <CardFooter className="flex-col items-stretch gap-4 border-t pt-6 bg-muted/50">
+                <CardFooter className="flex-col items-stretch gap-4 border-t pt-6">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total Cost</span>
-                    <span className="text-2xl font-bold">${grandTotalCost.toFixed(2)}</span>
+                    <span className="text-2xl font-bold">€{grandTotalCost.toFixed(2)}</span>
                   </div>
                 </CardFooter>
               </Card>
@@ -394,7 +394,7 @@ export function PaintCalculator() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Price ($/m²)</Label>
+                      <Label>Price (€/m²)</Label>
                       <Input
                         type="number"
                         value={paint.price}
