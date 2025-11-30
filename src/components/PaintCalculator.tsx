@@ -14,15 +14,15 @@ export type Paint = {
   id: string
   name: string
   code: string
-  coverage: number // m2 per liter
-  price: number // per m2
+  coverage?: number // m2 per liter
+  price?: number // per m2
 }
 
 export type Wall = {
   id: string
   name: string
-  length: number // in meters
-  height: number // in meters
+  length?: number // in meters
+  height?: number // in meters
   paintId: string
 }
 
@@ -32,32 +32,17 @@ export type Room = {
   walls: Wall[]
 }
 
-const DEFAULT_PAINTS: Paint[] = [
-  { id: "1", name: "Pure White", code: "WH-01", coverage: 10, price: 5 },
-  { id: "2", name: "Sky Blue", code: "BL-02", coverage: 12, price: 6 },
-]
-
-const DEFAULT_ROOMS: Room[] = [
-  {
-    id: "1",
-    name: "Living Room",
-    walls: [
-      { id: "w1", name: "North Wall", length: 5.00, height: 3.00, paintId: "1" },
-      { id: "w2", name: "South Wall", length: 5.00, height: 3.00, paintId: "1" },
-    ],
-  },
-]
 
 export function PaintCalculator() {
   // State
   const [paints, setPaints] = useState<Paint[]>(() => {
     const saved = localStorage.getItem("paints")
-    return saved ? JSON.parse(saved) : DEFAULT_PAINTS
+    return saved ? JSON.parse(saved) : []
   })
 
   const [rooms, setRooms] = useState<Room[]>(() => {
     const saved = localStorage.getItem("rooms")
-    return saved ? JSON.parse(saved) : DEFAULT_ROOMS
+    return saved ? JSON.parse(saved) : []
   })
 
   // Persistence
@@ -73,10 +58,8 @@ export function PaintCalculator() {
   const addPaint = () => {
     const newPaint: Paint = {
       id: crypto.randomUUID(),
-      name: "New Paint",
-      code: "CODE",
-      coverage: 10,
-      price: 5,
+      name: "",
+      code: "",
     }
     setPaints([...paints, newPaint])
   }
@@ -118,11 +101,9 @@ export function PaintCalculator() {
               ...r.walls,
               {
                 id: crypto.randomUUID(),
-                name: `Wall ${r.walls.length + 1}`,
-                length: 4,
-                height: 2.5,
-                paintId: paints[0]?.id || "",
-              },
+                name: "New Wall",
+                paintId: "",
+              }
             ],
           }
         }
@@ -171,9 +152,9 @@ export function PaintCalculator() {
           if (!paintTotals[paint.id]) {
             paintTotals[paint.id] = { area: 0, cost: 0, liters: 0 }
           }
-          const area = wall.length * wall.height
-          const cost = area * paint.price
-          const liters = area / paint.coverage
+          const area = wall.length! * wall.height!
+          const cost = area * paint.price!
+          const liters = area / paint.coverage!
           paintTotals[paint.id].area += area
           paintTotals[paint.id].cost += cost
           paintTotals[paint.id].liters += liters
@@ -251,7 +232,7 @@ export function PaintCalculator() {
                             <Input
                               type="number"
                               step="0.01"
-                              value={wall.length.toFixed(2)}
+                              value={ wall.length }
                               onChange={(e) => updateWall(room.id, wall.id, "length", parseFloat(e.target.value) || 0)}
                               className="h-8"
                             />
@@ -261,7 +242,7 @@ export function PaintCalculator() {
                             <Input
                               type="number"
                               step="0.01"
-                              value={wall.height.toFixed(2)}
+                              value={ wall.height }
                               onChange={(e) => updateWall(room.id, wall.id, "height", parseFloat(e.target.value) || 0)}
                               className="h-8"
                             />
@@ -269,7 +250,7 @@ export function PaintCalculator() {
                           <div className="col-span-3">
                             <Label className="text-xs text-muted-foreground">Area</Label>
                             <div className="h-8 flex items-center px-3 bg-muted rounded-md text-sm">
-                              {(wall.length * wall.height).toFixed(2)} m²
+                              {(wall.length! * wall.height!).toFixed(2)} m²
                             </div>
                           </div>
                           <div className="col-span-3">
